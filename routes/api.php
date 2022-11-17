@@ -19,14 +19,20 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function (){
     Route::post('login', 'login');
     Route::post('register', 'register');
+
+    Route::get('products', [\App\Http\Controllers\Api\Public\ProductController::class, 'index']);
+    Route::get('products/{slug}', [\App\Http\Controllers\Api\Public\ProductController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::post('logout', [AuthController::class, 'logout']);
-
+    #Customer
+    Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'admin'], function(){
+        Route::resource('products', ProductController::class)->except('create', 'edit', 'index', 'show');
+    });
 
     #Admin Route
     Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'admin'], function(){
-        Route::resource('products', ProductController::class)->except('create', 'edit');
+        Route::resource('products', ProductController::class)->except('create', 'edit', 'index');
     });
 });
