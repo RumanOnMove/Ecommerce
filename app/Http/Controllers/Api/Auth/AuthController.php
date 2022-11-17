@@ -52,7 +52,7 @@ class AuthController extends Controller
             return json_response('Success', ResponseAlias::HTTP_OK, $user, 'You have been successfully register', true);
 
         } catch (Exception $exception) {
-            return json_response('Failed', ResponseAlias::HTTP_BAD_REQUEST, '', $exception->getMessage(), false);
+            return json_response('Failed', ResponseAlias::HTTP_PAYMENT_REQUIRED, '', $exception->getMessage(), false);
         }
 
     }
