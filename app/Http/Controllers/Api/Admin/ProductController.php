@@ -15,7 +15,13 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ProductController extends Controller
 {
-    public function index(Request $request){
+    /**
+     * List Product
+     * @param Request $request
+     * @return mixed
+     */
+    public function index(Request $request): mixed
+    {
         $products = Product::where('status', Product::Status['Active']);
         $products = build_collection_response($request, $products);
         $products = ProductResource::collection($products);
@@ -79,6 +85,50 @@ class ProductController extends Controller
             $product = new ProductResource($product);
             return json_response('Success', ResponseAlias::HTTP_OK, $product, 'Product get successfully', true);
         } catch (Exception $exception){
+            return json_response('Failed', ResponseAlias::HTTP_NOT_FOUND, '', $exception->getMessage(), false);
+        }
+    }
+
+    /**
+     * Update Product
+     * @param Request $request
+     * @param $slug
+     * @return JsonResponse
+     */
+    public function update(Request $request, $slug): JsonResponse
+    {
+        $product = Product::where('slug', $slug)->first();
+        if (empty($product)){
+            return json_response('Failed', ResponseAlias::HTTP_NOT_FOUND, '', 'Product not found', false);
+        }
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|unique:products,name,'.$product->id,
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'low_stock' => 'required|integer'
+        ]);
+
+        if ($validator->fails()){
+            return validation_response($validator->errors()->getMessages());
+        }
+
+        try {
+            $productUpdate = $product->update([
+                'name' => $request->input('name'),
+                'slug' => Str::slug($request->input('name')),
+                'price' => $request->input('price'),
+                'quantity' => $request->input('quantity'),
+                'low_stock' => $request->input('low_stock'),
+                'status' => $request->input('status') ? $request->input('status') : Product::Status['Active']
+            ]);
+
+            if (empty($productUpdate)){
+                throw new Exception('Could not update product');
+            }
+
+            $product = new ProductResource($product->fresh());
+            return json_response('Success', ResponseAlias::HTTP_OK, $product, 'Product updated successfully', true);
+        } catch (Exception $exception) {
             return json_response('Failed', ResponseAlias::HTTP_NOT_FOUND, '', $exception->getMessage(), false);
         }
     }
