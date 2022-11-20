@@ -26,6 +26,7 @@ Route::controller(AuthController::class)->group(function (){
 
 Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::post('logout', [AuthController::class, 'logout']);
+
     #Customer
     Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'admin'], function(){
         Route::resource('products', ProductController::class)->except('create', 'edit', 'index', 'show');
