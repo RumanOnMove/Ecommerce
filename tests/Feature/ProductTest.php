@@ -36,14 +36,29 @@ class ProductTest extends TestCase
         ]);
         $this->assertAuthenticated();
 
-        $response = $this->post('/api/admin/products', [
-            'name' => 'Product One',
-            'slug' => Str::slug('Product One'),
+        $response = $this->postJson('/api/admin/products', [
+            'name' => 'Product Eight',
+            'slug' => Str::slug('Product Eight'),
             'price' => 355,
             'quantity' => 10,
             'low_stock' => 2
         ]);
+        $response->assertStatus(200)->assertJsonStructure([
+            'status',
+            'statusText',
+            'message',
+            'data' => [
+                'id',
+                'name',
+                'slug',
+                'price',
+                'quantity',
+                'lowStock',
+                'status',
+                'statusLabel'
+            ],
+            'ok'
+        ]);
 
-        $response->assertStatus(200);
     }
 }
