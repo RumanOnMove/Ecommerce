@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Customer\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,8 +29,8 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::post('logout', [AuthController::class, 'logout']);
 
     #Customer
-    Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'admin'], function(){
-        Route::resource('products', ProductController::class)->except('create', 'edit', 'index', 'show');
+    Route::group(['middleware' => ['auth:sanctum', 'customer']], function(){
+        Route::resource('orders', OrderController::class)->except('create', 'edit');
     });
 
     #Admin Route

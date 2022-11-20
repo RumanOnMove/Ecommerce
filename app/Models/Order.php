@@ -35,8 +35,8 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function order_master(): BelongsTo
+    public function order_masters(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(OrderMaster::class, 'order_id', 'id');
+        return $this->hasMany(OrderMaster::class, 'order_id', 'id');
     }
 }
