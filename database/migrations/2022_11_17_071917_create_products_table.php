@@ -17,9 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('name', 55)->unique();
             $table->string('slug', 55)->unique();
-            $table->decimal('price', 10, 2);
-            $table->integer('quantity');
-            $table->integer('low_stock');
             $table->boolean('status');
             $table->timestamps();
         });

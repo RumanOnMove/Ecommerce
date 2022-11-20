@@ -19,12 +19,12 @@ class ProductController extends Controller
      */
     public function index(Request $request): mixed
     {
-        $products = Product::where('status', Product::Status['Active']);
+        $products = Product::where('status', Product::Status['Active'])->with(['product_variations' => function($q){
+            return $q->with('color', 'size');
+        }]);
         $products = build_collection_response($request, $products);
-        return ProductResource::collection($products)->additional([
-            'add' => 'data'
-        ]);
-//        return collection_response($products, 'Success', ResponseAlias::HTTP_OK, 'Products get successfully');
+        $products = ProductResource::collection($products);
+        return collection_response($products, 'Success', ResponseAlias::HTTP_OK, 'Products get successfully');
     }
 
     /**

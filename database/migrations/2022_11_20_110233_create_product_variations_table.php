@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('color_id')->nullable();
             $table->unsignedBigInteger('size_id')->nullable();
+            $table->integer('quantity');
+            $table->integer('low_stock');
             $table->decimal('price', 10, 2);
             $table->timestamps();
 

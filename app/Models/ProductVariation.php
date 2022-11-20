@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductVariation extends Model
 {
@@ -15,21 +15,23 @@ class ProductVariation extends Model
         'product_id',
         'color_id',
         'size_id',
+        'quantity',
+        'low_stock',
         'price'
     ];
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id', 'id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function colors(): HasMany
+    public function color(): HasOne
     {
-        return $this->hasMany(Color::class, 'color_id', 'id');
+        return $this->hasOne(Color::class, 'id');
     }
 
-    public function sizes(): HasMany
+    public function size(): HasOne
     {
-        return $this->hasMany(Size::class, 'size_id', 'id');
+        return $this->hasOne(Size::class, 'id');
     }
 }

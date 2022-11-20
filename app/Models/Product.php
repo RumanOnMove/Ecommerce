@@ -13,9 +13,6 @@ class Product extends Model
     protected $fillable = [
         'name',
         'slug',
-        'price',
-        'quantity',
-        'low_stock',
         'status'
     ];
 
@@ -31,6 +28,6 @@ class Product extends Model
 
     public function product_variations(): HasMany
     {
-        return $this->hasMany(ProductVariation::class, 'product_id', 'íd');
+        return $this->hasMany(ProductVariation::class, 'product_id');
     }
 }
