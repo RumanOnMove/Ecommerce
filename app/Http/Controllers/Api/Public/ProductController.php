@@ -21,8 +21,10 @@ class ProductController extends Controller
     {
         $products = Product::where('status', Product::Status['Active']);
         $products = build_collection_response($request, $products);
-        $products = ProductResource::collection($products);
-        return collection_response($products, 'Success', ResponseAlias::HTTP_OK, 'Products get successfully');
+        return ProductResource::collection($products)->additional([
+            'add' => 'data'
+        ]);
+//        return collection_response($products, 'Success', ResponseAlias::HTTP_OK, 'Products get successfully');
     }
 
     /**

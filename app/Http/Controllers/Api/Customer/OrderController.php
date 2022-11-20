@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Jobs\SendOrderEmailJob;
 use App\Models\Order;
 use App\Models\Product;
 use Exception;
@@ -88,7 +89,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-
+//            dispatch(new SendOrderEmailJob($request->user()));
             $order = $order->load('order_masters');
             $order = new OrderResource($order);
             return json_response('Success', ResponseAlias::HTTP_OK, $order, 'Order created successfully', true);
