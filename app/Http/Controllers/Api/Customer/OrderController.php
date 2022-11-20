@@ -89,7 +89,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-//            dispatch(new SendOrderEmailJob($request->user()));
+            dispatch(new SendOrderEmailJob($request->user()));
             $order = $order->load('order_masters');
             $order = new OrderResource($order);
             return json_response('Success', ResponseAlias::HTTP_OK, $order, 'Order created successfully', true);

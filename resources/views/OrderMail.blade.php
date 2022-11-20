@@ -8,7 +8,7 @@
 </head>
 <body>
 <h1>Test EMAIL</h1>
-<p>Hello</p>
-<p>You have a new order</p>
+<p>Hello, {{ $user->name }}</p>
+<p>Your order is placed successfully</p>
 </body>
 </html>
