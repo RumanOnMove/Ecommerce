@@ -7,6 +7,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Product;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -16,14 +17,24 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 class OrderController extends Controller
 {
     public function index(Request $request){
-        // Todo return auth user order list
+        $orders = $request->user()->orders()->with('order_masters');
+        $orders = build_collection_response($request, $orders);
+        $orders = OrderResource::collection($orders);
+
+        return collection_response($orders, 'Success', ResponseAlias::HTTP_OK, 'Order list get successful');
     }
 
     public function show(Request $request, $id){
         // Todo return auth user specific order
     }
 
-    public function store(Request $request){
+    /**
+     * Order Store
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
         $validator = Validator::make($request->all(), [
             'item_sub_total' => 'required|numeric',
             'discount' => 'required|numeric',
