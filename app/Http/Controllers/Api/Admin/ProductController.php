@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
+use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use Exception;
@@ -25,47 +26,74 @@ class ProductController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:products',
-            'options' => 'required|array'
+            'id' => 'nullable|integer',
+            'name' => 'nullable|unique:products',
+            'attributes' => 'nullable|array',
+            'sku' => 'required:max:25',
+            'price' => 'required|numeric',
         ]);
 
         if ($validator->fails()){
             return validation_response($validator->errors()->getMessages());
         }
 
+
         try {
             DB::beginTransaction();
-            $product = Product::create([
-                'name' => $request->input('name'),
-                'slug' => Str::slug($request->input('name')),
-                'status' => $request->input('status') ? $request->input('status') : Product::Status['Active']
-            ]);
-
-            if (empty($product)){
-                throw new Exception('Could not create product');
-            }
-
-            foreach ($request->input('options') as $option){
-                $productV = ProductVariation::create([
-                    'product_id' => $product->id,
-                    'color_id' => $option['color_id'],
-                    'size_id' => $option['size_id'],
-                    'quantity' => $option['quantity'],
-                    'low_stock' => $option['low_stock'],
-                    'price' => $option['price']
+            if (!empty($request->input('id'))){
+                $product = Product::where('id', $request->input('id'))->first();
+                if (empty($product)){
+                    throw new Exception('Could not find product');
+                }
+            } else {
+                $product = Product::create([
+                    'name' => $request->input('name'),
+                    'slug' => Str::slug($request->input('name'))
                 ]);
 
-                if (empty($productV)){
-                    throw new Exception('Could not create product variant');
+                if (empty($product)){
+                    throw new Exception('Could not create product');
                 }
             }
 
+            if (count($request->input('attributes')) > 0){
+                foreach ($request->input('attributes') as $attribute){
+                    if ($attribute['id'] === null){
+                        //Creating attribute
+                        $attribute = Attribute::create([
+                            'name' => $attribute['name'],
+                            'slug' => Str::slug($attribute['name']),
+                        ]);
+
+                        if (empty($attribute)){
+                            throw new Exception('Could not create attribute');
+                        }
+                        //Creating value
+                        foreach ($attribute['values'] as $value){
+                            if ($value['id'] === null){
+                                $value = $attribute->values()->create([
+                                    'name' => $value['name'],
+                                    'slug' => Str::slug($value['name']),
+                                ]);
+                                if (empty($value)){
+                                    throw new Exception('Could not create value');
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+
+
+
+
+
+
             DB::commit();
-            $product = Product::where('id', $product->id)->with(['product_variations' => function($q){
-                return $q->with('color', 'size');
-            }])->first();
-            $product = new ProductResource($product);
-            return json_response('Success', ResponseAlias::HTTP_OK, $product, 'Product created successfully', true);
+
+
+            return json_response('Success', ResponseAlias::HTTP_OK, '', 'Product created successfully', true);
         } catch (Exception $exception) {
             DB::rollBack();
             return json_response('Failed', ResponseAlias::HTTP_PAYMENT_REQUIRED, '', $exception->getMessage(), false);

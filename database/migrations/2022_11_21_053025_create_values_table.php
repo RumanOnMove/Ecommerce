@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('colors', function (Blueprint $table) {
+        Schema::create('values', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('slug')->unique();
-            $table->boolean('status')->default(1);
+            $table->unsignedBigInteger('attribute_id');
+            $table->string('name');
+            $table->string('slug');
             $table->timestamps();
+
+            $table->foreign('attribute_id')->references('id')->on('attributes')->cascadeOnDelete();
         });
     }
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('colors');
+        Schema::dropIfExists('values');
     }
 };

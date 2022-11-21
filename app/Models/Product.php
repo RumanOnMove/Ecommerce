@@ -26,8 +26,16 @@ class Product extends Model
         return array_flip(self::Status)[$this->attributes['status']];
     }
 
-    public function product_variations(): HasMany
+    # Product Skus
+    public function skus(): HasMany
     {
-        return $this->hasMany(ProductVariation::class, 'product_id');
+        return $this->hasMany(Sku::class, 'product_id',  'id');
     }
+
+    # Product Variants
+    public function product_variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'id');
+    }
+
 }
