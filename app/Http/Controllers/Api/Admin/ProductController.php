@@ -37,18 +37,21 @@ class ProductController extends Controller
             return validation_response($validator->errors()->getMessages());
         }
 
-
         try {
             DB::beginTransaction();
+            // Find product if old
             if (!empty($request->input('id'))){
                 $product = Product::where('id', $request->input('id'))->first();
                 if (empty($product)){
                     throw new Exception('Could not find product');
                 }
-            } else {
+            }
+            // Creating product if new
+            else {
                 $product = Product::create([
                     'name' => $request->input('name'),
-                    'slug' => Str::slug($request->input('name'))
+                    'slug' => Str::slug($request->input('name')),
+                    'status' => Product::Status['Active']
                 ]);
 
                 if (empty($product)){
@@ -57,9 +60,9 @@ class ProductController extends Controller
             }
 
             if (count($request->input('attributes')) > 0){
+                //Creating attributes
                 foreach ($request->input('attributes') as $attribute){
                     if ($attribute['id'] === null){
-                        //Creating attribute
                         $attribute = Attribute::create([
                             'name' => $attribute['name'],
                             'slug' => Str::slug($attribute['name']),
@@ -68,7 +71,6 @@ class ProductController extends Controller
                         if (empty($attribute)){
                             throw new Exception('Could not create attribute');
                         }
-                        //Creating value
                         foreach ($attribute['values'] as $value){
                             if ($value['id'] === null){
                                 $value = $attribute->values()->create([
@@ -82,9 +84,18 @@ class ProductController extends Controller
                         }
                     }
                 }
-                
+            }
+            // Creating product sku
+            $sku = $product->skus()->create([
+                'name' => $request->input('sku'),
+                'price' => $request->input('price')
+            ]);
+
+            if (empty($sku)){
+                throw new Exception('Could not create sku');
             }
 
+            dd($request->input('attributes'));
 
 
 

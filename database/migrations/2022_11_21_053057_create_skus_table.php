@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('skus', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
+            $table->string('name')->unique();
             $table->decimal('price', 10, 2);
             $table->timestamps();
         });

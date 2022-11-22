@@ -16,18 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-        $roles = [
-            'Admin',
-            'Customer'
-        ];
-
-        foreach ($roles as $role){
-            Role::create([
-                'name' => $role,
-                'slug' => Str::slug($role),
-                'status' => Role::Status['Active']
-            ]);
-        }
+         \App\Models\User::factory(1000)->create();
+//        $roles = [
+//            'Admin',
+//            'Customer'
+//        ];
+//
+//        foreach ($roles as $role){
+//            Role::create([
+//                'name' => $role,
+//                'slug' => Str::slug($role),
+//                'status' => Role::Status['Active']
+//            ]);
+//        }
     }
 }
