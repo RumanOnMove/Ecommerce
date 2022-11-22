@@ -33,11 +33,6 @@ class GeneralNotification extends Notification
     public function toMail($notifiable)
     {
         Mail::to($this->admin->email)->send(new UserListMail($this->admin, $this->customers));
-        return (new MailMessage)
-                    ->line('Hello')
-                    ->line('list: '.$this->customers)
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
     }
 
     public function toArray($notifiable)
