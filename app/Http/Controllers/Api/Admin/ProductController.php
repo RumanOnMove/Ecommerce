@@ -70,12 +70,23 @@ class ProductController extends Controller
 
             if (count($request->input('attributes')) > 0){
                 foreach ($request->input('attributes') as $attribute){
-                    foreach ($attribute['values'] as $value){
+                    if (count($attribute['values']) > 0){
+                        foreach ($attribute['values'] as $value){
+                            $product_variant = ProductVariant::create([
+                                'product_id' => $product->id,
+                                'sku_id' => $sku->id,
+                                'attribute_id' => $attribute['id'],
+                                'value_id' => $value
+                            ]);
+                            if (empty($product_variant)){
+                                throw new Exception('Could not create product variant');
+                            }
+                        }
+                    } else {
                         $product_variant = ProductVariant::create([
                             'product_id' => $product->id,
                             'sku_id' => $sku->id,
                             'attribute_id' => $attribute['id'],
-                            'value_id' => $value
                         ]);
                         if (empty($product_variant)){
                             throw new Exception('Could not create product variant');
@@ -87,6 +98,8 @@ class ProductController extends Controller
             $product = $product->load(['product_variants' => function($q){
                 return $q->with('sku', 'attribute', 'value');
             }]);
+
+            $product = new ProductResource($product);
             return json_response('Success', ResponseAlias::HTTP_OK, $product, 'Product created successfully', true);
         } catch (Exception $exception) {
             DB::rollBack();

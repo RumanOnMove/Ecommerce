@@ -20,7 +20,7 @@ class ProductResource extends JsonResource
             'slug' => $this->slug,
             'status' => $this->status,
             'statusLabel' => $this->status_label,
-            'productVariations' => ProductVariantResource::collection($this->whenLoaded('product_variations'))
+            'productVariations' => ProductVariantResource::collection($this->whenLoaded('product_variants'))
         ];
     }
 }
