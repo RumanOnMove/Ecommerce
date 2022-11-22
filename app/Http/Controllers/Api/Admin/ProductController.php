@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
-use App\Models\Attribute;
 use App\Models\Product;
-use App\Models\ProductVariation;
+use App\Models\ProductVariant;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -59,52 +57,37 @@ class ProductController extends Controller
                 }
             }
 
-            if (count($request->input('attributes')) > 0){
-                //Creating attributes
-                foreach ($request->input('attributes') as $attribute){
-                    if ($attribute['id'] === null){
-                        $attribute = Attribute::create([
-                            'name' => $attribute['name'],
-                            'slug' => Str::slug($attribute['name']),
-                        ]);
-
-                        if (empty($attribute)){
-                            throw new Exception('Could not create attribute');
-                        }
-                        foreach ($attribute['values'] as $value){
-                            if ($value['id'] === null){
-                                $value = $attribute->values()->create([
-                                    'name' => $value['name'],
-                                    'slug' => Str::slug($value['name']),
-                                ]);
-                                if (empty($value)){
-                                    throw new Exception('Could not create value');
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             // Creating product sku
             $sku = $product->skus()->create([
                 'name' => $request->input('sku'),
                 'price' => $request->input('price')
             ]);
 
+
             if (empty($sku)){
                 throw new Exception('Could not create sku');
             }
 
-            dd($request->input('attributes'));
-
-
-
-
-
+            if (count($request->input('attributes')) > 0){
+                foreach ($request->input('attributes') as $attribute){
+                    foreach ($attribute['values'] as $value){
+                        $product_variant = ProductVariant::create([
+                            'product_id' => $product->id,
+                            'sku_id' => $sku->id,
+                            'attribute_id' => $attribute['id'],
+                            'value_id' => $value
+                        ]);
+                        if (empty($product_variant)){
+                            throw new Exception('Could not create product variant');
+                        }
+                    }
+                }
+            }
             DB::commit();
-
-
-            return json_response('Success', ResponseAlias::HTTP_OK, '', 'Product created successfully', true);
+            $product = $product->load(['product_variants' => function($q){
+                return $q->with('sku', 'attribute', 'value');
+            }]);
+            return json_response('Success', ResponseAlias::HTTP_OK, $product, 'Product created successfully', true);
         } catch (Exception $exception) {
             DB::rollBack();
             return json_response('Failed', ResponseAlias::HTTP_PAYMENT_REQUIRED, '', $exception->getMessage(), false);

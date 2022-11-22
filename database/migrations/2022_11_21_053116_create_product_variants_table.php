@@ -23,8 +23,6 @@ return new class extends Migration
 
             $table->foreign('product_id')->references('id')->on('products');
             $table->foreign('sku_id')->references('id')->on('skus');
-            $table->foreign('attribute_id')->references('id')->on('attributes');
-            $table->foreign('value_id')->references('id')->on('values');
         });
     }
 

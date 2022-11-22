@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Attribute;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -29,5 +30,31 @@ class DatabaseSeeder extends Seeder
 //                'status' => Role::Status['Active']
 //            ]);
 //        }
+
+        $attributes = [
+            'Size' => [
+                'Small',
+                'Medium',
+                'Big',
+            ],
+            'Color' => [
+                'Green',
+                'Red',
+                'Yellow',
+            ]
+        ];
+
+        foreach ($attributes as $key=>$values){
+            $attribute = Attribute::create([
+                'name' => $key,
+                'slug' => Str::slug($key)
+            ]);
+            foreach ($values as $value){
+                $attribute->values()->create([
+                    'name' => $value,
+                    'slug' => Str::slug($value)
+                ]);
+            }
+        }
     }
 }
