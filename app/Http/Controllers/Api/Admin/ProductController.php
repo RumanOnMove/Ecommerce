@@ -95,8 +95,10 @@ class ProductController extends Controller
                 }
             }
             DB::commit();
-            $product = $product->load(['product_variants' => function($q){
-                return $q->with('sku', 'attribute', 'value');
+            $product = $product->load(['skus' => function($q){
+                return $q->with(['product_variants' => function($qq){
+                    return $qq->with('attribute', 'value');
+                }]);
             }]);
 
             $product = new ProductResource($product);

@@ -30,9 +30,13 @@ class SendingCustomMessageToCustomerCommand extends Command
      */
     public function handle()
     {
-        $customers = User::where('role_id', 2)->get();
         $message = $this->argument('message');
-        Notification::send($customers, new SendingCustomMessageToCustomerNotification($message));
-        return Command::SUCCESS;
+        User::where('role_id', 2)->chunk(5, function ($customers) use($message){
+            foreach ($customers as $customer){
+                $customer->notify(new SendingCustomMessageToCustomerNotification($message));
+            }
+        });
+//        Notification::send($customers, new SendingCustomMessageToCustomerNotification($message));
+//        return Command::SUCCESS;
     }
 }

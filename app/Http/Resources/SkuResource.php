@@ -12,7 +12,7 @@ class SkuResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'price' => $this->price,
-            'product' => new ProductResource($this->whenLoaded('product'))
+            'productVariants' => ProductVariantResource::collection($this->whenLoaded('product_variants'))
         ];
     }
 }

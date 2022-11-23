@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-//         \App\Models\User::factory(1000)->create();
+
         $roles = [
             'Admin',
             'Customer'
@@ -56,5 +56,6 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+        \App\Models\User::factory(1000)->create();
     }
 }

@@ -19,8 +19,10 @@ class ProductController extends Controller
      */
     public function index(Request $request): mixed
     {
-        $products = Product::where('status', Product::Status['Active'])->with(['product_variants' => function($q){
-            return $q->with('sku', 'attribute', 'value');
+        $products = Product::where('status', Product::Status['Active'])->with(['skus' => function($q){
+            return $q->with(['product_variants' => function($qq){
+                return $qq->with('attribute', 'value');
+            }]);
         }]);
         $products = build_collection_response($request, $products);
         $products = ProductResource::collection($products);
