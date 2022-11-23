@@ -82,44 +82,8 @@ class ProductController extends Controller
                         }
 
                         if (count($attr['values']) > 0){
-                            foreach ($attr['values'] as $val){
-                                // Creating value if not exist
-                                if (empty($val['id'])){
-                                    $value = $attribute->values()->create([
-                                        'name' => $val['name'],
-                                        'slug' => Str::slug($val['name'])
-                                    ]);
-
-                                    if (empty($value)){
-                                        throw new Exception('Could not create value');
-                                    }
-
-                                    // Creating product variant
-                                    $product_variant = ProductVariant::create([
-                                        'product_id' => $product->id,
-                                        'sku_id' => $sku->id,
-                                        'attribute_id' => $attribute->id,
-                                        'value_id' => $value->id
-                                    ]);
-
-                                    if (empty($product_variant)){
-                                        throw new Exception('Could not create product variant');
-                                    }
-                                } else {
-                                    $value = Value::where('id', $val['id'])->first();
-                                    if (empty($value)){
-                                        throw new Exception('Could not find value');
-                                    }
-                                    $product_variant = ProductVariant::create([
-                                        'product_id' => $product->id,
-                                        'sku_id' => $sku->id,
-                                        'attribute_id' => $attribute->id,
-                                        'value_id' => $value->id
-                                    ]);
-                                    if (empty($product_variant)){
-                                        throw new Exception('Could not create product variant');
-                                    }
-                                }
+                            if (!$this->_store_variants($attr, $attribute, $product, $sku)){
+                                throw new Exception('Variation is not created');
                             }
                         }
 
@@ -128,43 +92,9 @@ class ProductController extends Controller
                         if (empty($attribute)){
                             throw new Exception('Could not find attribute');
                         }
-                        foreach ($attr['values'] as $val){
-                            // Creating value if not exist
-                            if (empty($val['id'])){
-                                $value = $attribute->values()->create([
-                                    'name' => $val['name'],
-                                    'slug' => Str::slug($val['name'])
-                                ]);
-
-                                if (empty($value)){
-                                    throw new Exception('Could not create value');
-                                }
-                                $product_variant = ProductVariant::create([
-                                    'product_id' => $product->id,
-                                    'sku_id' => $sku->id,
-                                    'attribute_id' => $attribute->id,
-                                    'value_id' => $value->id
-                                ]);
-                                if (empty($product_variant)){
-                                    throw new Exception('Could not create product variant');
-                                }
-                            } else {
-                                $value = Value::where('id', $val['id'])->first();
-                                if (empty($value)){
-                                    throw new Exception('Could not find value');
-                                }
-                                $product_variant = ProductVariant::create([
-                                    'product_id' => $product->id,
-                                    'sku_id' => $sku->id,
-                                    'attribute_id' => $attribute->id,
-                                    'value_id' => $value->id
-                                ]);
-                                if (empty($product_variant)){
-                                    throw new Exception('Could not create product variant');
-                                }
-                            }
+                        if (!$this->_store_variants($attr, $attribute, $product, $sku)){
+                            throw new Exception('Variation is not created');
                         }
-
                     }
                 }
             }
@@ -247,5 +177,51 @@ class ProductController extends Controller
         } catch (Exception $exception){
             return json_response('Failed', ResponseAlias::HTTP_NOT_FOUND, '', $exception->getMessage(), false);
         }
+    }
+
+
+    private function _store_variants($attr, $attribute, $product, $sku){
+        try{
+            foreach ($attr['values'] as $val){
+                // Creating value if not exist
+                if (empty($val['id'])){
+                    $value = $attribute->values()->create([
+                        'name' => $val['name'],
+                        'slug' => Str::slug($val['name'])
+                    ]);
+
+                    if (empty($value)){
+                        throw new Exception('Could not create value');
+                    }
+                    $product_variant = ProductVariant::create([
+                        'product_id' => $product->id,
+                        'sku_id' => $sku->id,
+                        'attribute_id' => $attribute->id,
+                        'value_id' => $value->id
+                    ]);
+                    if (empty($product_variant)){
+                        throw new Exception('Could not create product variant');
+                    }
+                } else {
+                    $value = Value::where('id', $val['id'])->first();
+                    if (empty($value)){
+                        throw new Exception('Could not find value');
+                    }
+                    $product_variant = ProductVariant::create([
+                        'product_id' => $product->id,
+                        'sku_id' => $sku->id,
+                        'attribute_id' => $attribute->id,
+                        'value_id' => $value->id
+                    ]);
+                    if (empty($product_variant)){
+                        throw new Exception('Could not create product variant');
+                    }
+                }
+            }
+            return true;
+        } catch (Exception $exception){
+            return false;
+        }
+
     }
 }
