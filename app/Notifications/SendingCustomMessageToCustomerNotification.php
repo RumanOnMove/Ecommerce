@@ -11,16 +11,16 @@ class SendingCustomMessageToCustomerNotification extends Notification implements
 {
     use Queueable;
 
-    public $message;
+    public $bodyContent;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct($bodyContent)
     {
-        $this->message = $message;
+        $this->bodyContent = $bodyContent;
     }
 
     /**
@@ -42,11 +42,7 @@ class SendingCustomMessageToCustomerNotification extends Notification implements
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-                    ->line('Hello')
-                    ->line('Message: '. $this->message)
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        return (new MailMessage)->view('messageMail', ['bodyContent' => $this->bodyContent]);
     }
 
     /**

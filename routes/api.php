@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\ProductController;
+use App\Http\Controllers\Api\Admin\SendingMailController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Customer\OrderController;
 use Illuminate\Http\Request;
@@ -36,5 +37,6 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     #Admin Route
     Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'admin'], function(){
         Route::resource('products', ProductController::class)->except('create', 'edit', 'index');
+        Route::post('send-general-mail', [SendingMailController::class, 'send_mail']);
     });
 });
