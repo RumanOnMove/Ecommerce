@@ -333,6 +333,6 @@
     </style>
 </head>
 <body>
-{{ $bodyContent }}
+{!! $bodyContent->body !!}
 </body>
 </html>

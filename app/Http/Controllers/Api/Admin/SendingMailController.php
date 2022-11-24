@@ -18,7 +18,7 @@ class SendingMailController extends Controller
             if (empty($emailTemplate)){
                 throw new Exception('Could not create email template');
             }
-//            Artisan::command('general:message')
+            Artisan::call('general:message', ['customers'=> $request->input('customers'), 'bodyContent'=>$emailTemplate]);
         } catch (Exception $exception){
             dd($exception->getMessage());
         }
